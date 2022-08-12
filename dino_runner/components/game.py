@@ -3,7 +3,9 @@ from msilib.schema import Font
 import pygame
 from dino_runner.components.dinosaur import Dinosaur
 from dino_runner.components.obstacles.obstacle_manager import ObtacleManager
+from dino_runner.components.power_ups.power_up_manager import PowerUpManager
 from dino_runner.utils.constants import BG, ICON, RUNNING, SCREEN_HEIGHT, SCREEN_WIDTH, TITLE, FPS
+from dino_runner.utils.text_utils import draw_message_component
 
 FONT_STYLE = "freesansbold.ttf"
 
@@ -14,11 +16,14 @@ class Game:
         pygame.display.set_icon(ICON)
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.clock = pygame.time.Clock()
+        self.clock = pygame.time.Clock()
+        self.player = Dinosaur()
+        self.obstacle_manager = ObtacleManager()
+        self.power_up_manager = PowerUpManager()
         self.playing = False
-        self.player=Dinosaur() #aca muestra el dinosaurio
         self.running = False
-        self.obstacle_manager= ObtacleManager()
-        self.game_speed = 20
+
+        self.game_speed = 10
         self.x_pos_bg = 0
         self.y_pos_bg = 380
 
@@ -37,6 +42,7 @@ class Game:
     def run(self):
         # Game loop: events - update - draw
         self.obstacle_manager.reset_obstacles()
+        self.power_up_manager.reset_power_ups()
         self.playing = True
         while self.playing:
             self.events()
@@ -56,6 +62,7 @@ class Game:
         user_input=pygame.key.get_pressed()
         self.player.update(user_input)
         self.obstacle_manager.update(self)
+        self.power_up_manager.update(self.points, self.game_speed, self.player)
 
     def update_score(self):
         # incrementar puntos
@@ -71,6 +78,7 @@ class Game:
         self.draw_background()
         self.player.draw(self.screen)
         self.obstacle_manager.draw(self.screen)
+        self.power_up_manager.draw(self.screen)
         pygame.display.update()
         pygame.display.flip()
 
